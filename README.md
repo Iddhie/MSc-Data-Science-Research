@@ -1,68 +1,37 @@
-# Blockchain Wallet Segmentation of a Decentralized Exchange (UniSwap)
+# Uniswap User Profiling via Deep Clustering: Behavioral Patterns and Economic Implications for Decentralized Exchanges
+This Google Colab Notebook carries out the data importing, PDA, EDA, clustering algorithm application and intra-cluster analysis for the bear market regime data.
 
-## Overview
+**Data Source:**  All of the data imported through Google Drive into this Notebook were extracted from the Google BigQuery Ethereum Cryptocurrency dataset using the BigQuery Studio platform.
 
-This repository contains a comprehensive analysis and clustering of blockchain wallet addresses based on their historical trading behavior on the UniSwap decentralized exchange (DEX). The primary objective is to identify meaningful behavioral patterns among wallet addresses through classical and deep learning-based clustering approaches.
+**Objectives:**
+1.	To apply feature engineering techniques to aggregate wallet activity data into a format suitable for behavioral clustering and temporal comparison.
+2.	To perform clustering analysis to identify distinct user groups based on wallet behavior in each market phase.
+3.	To determine the key features influencing wallet cluster formation and differentiation.
 
-## Dataset
+**Contents:**
+1. Manual K-Means Clustering Application
+2. Classical Clustering Algorithms Application
+- 2.1 K-Means Clustering
+- 2.2 Agglomerative Clustering
+- 2.3 GMM Clustering
+- 2.4 DBSCAN Clustering
+3. PCA Application
+- 3.1 K-Means Clustering
+- 3.2 Agglomerative Clustering
+- 3.3 GMM Clustering
+- 3.4 DBSCAN Clustering
+4. Deep-Learning Based Clustering
+- 4.1 Variation Autoencoder Model
+  - VAE + K-Means Clustering
+  - VAE + Agglomerative Clustering
+  - VAE + GMM Clustering
+  - VAE + DBSCAN Clustering
+- 4.2 Deep InfoMax Clustering
+  - Deep InfoMax + K-Means
+  - Intra-Cluster Analysis
+- 4.3 Deep Embedded Clustering
+- 4.4 Self-Organizing Map Clustering
 
-The dataset was constructed by collecting and merging:
-- Wallet addresses from UniSwap Sub-Graph
-- Transaction history from Etherscan API
-- Token balances from Covalent API
-
-This resulted in 2539 unique wallet addresses with complete transaction logs.
-
-## Methodology
-
-The analysis pipeline includes the following major steps:
-
-1. Data Preprocessing and Feature Engineering  
-   Transaction logs are aggregated per wallet address to extract behavioral features such as frequency, volume, and timing.
-
-2. Exploratory Data Analysis (EDA)  
-   Preliminary statistical summaries and correlation heatmaps are used to understand feature relationships and distributions.
-
-3. Classical Clustering Techniques  
-   - K-Means Clustering
-   - Agglomerative Hierarchical Clustering
-   - DBSCAN
-   - Gaussian Mixture Models (GMM)
-
-   Optimal cluster numbers are selected using the Elbow Method, Silhouette Score, Davies-Bouldin Index, and Calinski-Harabasz Score.
-
-4. Deep Learning-Based Clustering  
-   - Autoencoders
-   - Variational Autoencoders
-   - Deep Embedded Clustering (DEC)
-   - Deep InfoMax Clustering
-
-   These methods are implemented to capture non-linear patterns and high-dimensional embeddings of wallet behavior.
-
-5. Performance Comparison and Evaluation  
-   All models are evaluated and compared based on consistency, separability of clusters, and interpretability of outputs.
-
-## Key Dependencies
-
-- Python 3.8+
-- NumPy, Pandas
-- Scikit-learn
-- PyTorch
-- TensorFlow/Keras (for autoencoders)
-- Matplotlib, Seaborn
-- UMAP, HDBSCAN
-
-## How to Use
-
-Clone the repository and run the notebook sequentially:
-
-```bash
-git clone https://github.com/yourusername/UniswapWalletSegmentation.git
-cd UniswapWalletSegmentation
-jupyter notebook DatasetAnalysisMScThesis.ipynb
-```
-
-Make sure all dependencies listed above are installed in your Python environment.
 
 ## Applications
 
