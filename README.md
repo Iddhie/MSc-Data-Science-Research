@@ -1,5 +1,5 @@
 # Uniswap User Profiling via Deep Clustering: Behavioral Patterns and Economic Implications for Decentralized Exchanges
-This Google Colab Notebook carries out the data importing, PDA, EDA, clustering algorithm application and intra-cluster analysis for the bear market regime data.
+This Github repository contains the Google Colab Notebooks that carry out the data importing, PDA, EDA, clustering algorithm application and intra-cluster analysis for five market regimes (bull, bear, neutral, Terra-Luna collapse and FTX collapse).
 
 **Data Source:**  All of the data imported through Google Drive into this Notebook were extracted from the Google BigQuery Ethereum Cryptocurrency dataset using the BigQuery Studio platform.
 
