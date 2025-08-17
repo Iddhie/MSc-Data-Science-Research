@@ -1,0 +1,73 @@
+-- ============================================================
+-- BigQuery SQL Scripts for Extracting All Necessary Data
+-- Project: decent-surf-467510-j3
+-- Dataset: BigQuery Ethereum Cryptocurrency Dataset
+-- This file only contains the queries for data extraction of the bear market regime
+-- Note: These queries were slightly modified to extract data for other market regimes in subsequent analyses.
+-- ============================================================
+
+-- STEP 1: Extract wallet addresses that interacted with Uniswap swap contracts
+CREATE OR REPLACE TABLE `decent-surf-467510-j3.uniswap_wallets_and_transactions.wallet_addresses_feb3_9_2025` AS
+WITH uniswap_contracts AS (
+  SELECT addr AS contract_address
+  FROM UNNEST([
+    "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D", -- Uniswap V2 Router
+    "0xE592427A0AEce92De3Edee1F18E0157C05861564", -- Uniswap V3 Router
+    "0x3bFdA5285416eB06Ebc8BC0aBf7d105813af06d0"  -- Uniswap V4 Router
+  ]) AS addr
+)
+SELECT DISTINCT tx.from_address AS wallet_address
+FROM `bigquery-public-data.crypto_ethereum.transactions` tx
+JOIN uniswap_contracts u
+  ON LOWER(tx.to_address) = LOWER(u.contract_address)
+WHERE tx.block_timestamp BETWEEN "2025-02-03" AND "2025-02-09";
+
+
+-- STEP 2: Extract all transactions involving the identified wallets
+CREATE OR REPLACE TABLE `decent-surf-467510-j3.uniswap_wallets_and_transactions.transactions_feb3_9_2025` AS
+SELECT *
+FROM `bigquery-public-data.crypto_ethereum.transactions` t
+WHERE t.block_timestamp BETWEEN "2025-02-03" AND "2025-02-09"
+  AND (LOWER(t.from_address) IN (SELECT wallet_address FROM `decent-surf-467510-j3.uniswap_wallets_and_transactions.wallet_addresses_feb3_9_2025`)
+       OR LOWER(t.to_address) IN (SELECT wallet_address FROM `decent-surf-467510-j3.uniswap_wallets_and_transactions.wallet_addresses_feb3_9_2025`));
+
+
+-- STEP 3: Extract contract deployments associated with these wallets
+CREATE OR REPLACE TABLE `decent-surf-467510-j3.uniswap_wallets_and_transactions.contracts_feb3_9_2025` AS
+SELECT *
+FROM `bigquery-public-data.crypto_ethereum.contracts` c
+WHERE LOWER(c.contract_address) IN (
+  SELECT DISTINCT t.receipt_contract_address
+  FROM `bigquery-public-data.crypto_ethereum.transactions` t
+  WHERE t.block_timestamp BETWEEN "2025-02-03" AND "2025-02-09"
+    AND LOWER(t.from_address) IN (SELECT wallet_address FROM `decent-surf-467510-j3.uniswap_wallets_and_transactions.wallet_addresses_feb3_9_2025`)
+    AND t.receipt_contract_address IS NOT NULL
+);
+
+
+-- STEP 4: Extract all traces involving these wallets
+CREATE OR REPLACE TABLE `decent-surf-467510-j3.uniswap_wallets_and_transactions.traces_feb3_9_2025` AS
+SELECT *
+FROM `bigquery-public-data.crypto_ethereum.traces` tr
+WHERE tr.block_timestamp BETWEEN "2025-02-03" AND "2025-02-09"
+  AND (LOWER(tr.from_address) IN (SELECT wallet_address FROM `decent-surf-467510-j3.uniswap_wallets_and_transactions.wallet_addresses_feb3_9_2025`)
+       OR LOWER(tr.to_address) IN (SELECT wallet_address FROM `decent-surf-467510-j3.uniswap_wallets_and_transactions.wallet_addresses_feb3_9_2025`));
+
+
+-- STEP 5: Extract token transfers involving these wallets
+CREATE OR REPLACE TABLE `decent-surf-467510-j3.uniswap_wallets_and_transactions.token_transfers_feb3_9_2025` AS
+SELECT *
+FROM `bigquery-public-data.crypto_ethereum.token_transfers` tok
+WHERE tok.block_timestamp BETWEEN "2025-02-03" AND "2025-02-10"
+  AND (LOWER(tok.from_address) IN (SELECT wallet_address FROM `decent-surf-467510-j3.uniswap_wallets_and_transactions.wallet_addresses_feb3_9_2025`)
+       OR LOWER(tok.to_address) IN (SELECT wallet_address FROM `decent-surf-467510-j3.uniswap_wallets_and_transactions.wallet_addresses_feb3_9_2025`));
+
+
+-- STEP 6: Identify if any of these wallets were miners during this period
+CREATE OR REPLACE TABLE `decent-surf-467510-j3.uniswap_wallets_and_transactions.miner_flags_feb3_9_2025` AS
+SELECT DISTINCT w.wallet_address,
+       CASE WHEN LOWER(w.wallet_address) = LOWER(b.miner) THEN 1 ELSE 0 END AS is_miner
+FROM `decent-surf-467510-j3.uniswap_wallets_and_transactions.wallet_addresses_feb3_9_2025` w
+LEFT JOIN `bigquery-public-data.crypto_ethereum.blocks` b
+  ON LOWER(w.wallet_address) = LOWER(b.miner)
+WHERE b.timestamp BETWEEN "2025-02-03" AND "2025-02-09";
